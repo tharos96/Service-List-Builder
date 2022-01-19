@@ -12,7 +12,7 @@ def parse_config(section, array_name):
 
 def append_filter(filter, lowerupper, arr_name):
     key_data = []
-    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Class\\' + filter, 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
+    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, f'SYSTEM\CurrentControlSet\Control\Class\{filter}', 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
         key_data = winreg.QueryValueEx(key, lowerupper)[0]
         for i in arr_name:
             if i in key_data:
@@ -81,31 +81,39 @@ filter_data = {
     }
 }
 
-with open('build/Services-Disable.bat', 'a') as DS:
-    with open('build/Services-Enable.bat', 'a') as ES:
-        DS.write('@echo off\n')
-        ES.write('@echo off\n')
-        for item in rename_folders_executables:
-            DS.write('REN "' + item + '" "' + os.path.basename(item) + '_old" > NUL 2>&1\n')
-            ES.write('REN "' + item + '_old" "' + os.path.basename(item) + '" > NUL 2>&1\n')
-        for a in filter_data:
-            for b in filter_data[a]:
-                for c in filter_data[a][b]:
-                    if c in service_dump:
-                        DS_value = append_filter(a, b, service_dump)
-                        DS.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\\' + a + '" /v "' + b + '" /t REG_MULTI_SZ /d "' + DS_value + '" /f > NUL 2>&1\n')
-                        ES_value = split_lines(read_value('SYSTEM\CurrentControlSet\Control\Class\\' + a, b))
-                        ES.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\\' + a + '" /v "' + b + '" /t REG_MULTI_SZ /d "' + ES_value + '" /f > NUL 2>&1\n')
-                        break
-        for b in service_dump:
-            if read_value('SYSTEM\CurrentControlSet\Services\\' + b, 'Start') != 'Not exists':
-                if b in automatic:
-                    DS.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\\' + b + '" /v "Start" /t REG_DWORD /d "2" /f > NUL 2>&1\n')
-                elif b in manual:
-                    DS.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\\' + b + '" /v "Start" /t REG_DWORD /d "3" /f > NUL 2>&1\n')
-                else:
-                    DS.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\\' + b + '" /v "Start" /t REG_DWORD /d "4" /f > NUL 2>&1\n')
-                start_value = str(read_value('SYSTEM\CurrentControlSet\Services\\' + b, 'Start'))
-                ES.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\\' + b + '" /v "Start" /t REG_DWORD /d "' + start_value + '" /f > NUL 2>&1\n')
-        DS.write('shutdown /r /f /t 0\n')
-        ES.write('shutdown /r /f /t 0\n')
+DS = open('build/Services-Disable.bat', 'a')
+ES = open('build/Services-Enable.bat', 'a')
+
+DS.write('@echo off\n')
+ES.write('@echo off\n')
+
+for item in rename_folders_executables:
+    DS.write(f'REN "{item}" "{os.path.basename(item)}_old" > NUL 2>&1\n')
+    ES.write(f'REN "{item}_old" "{os.path.basename(item)}" > NUL 2>&1\n')
+
+for a in filter_data:
+    for b in filter_data[a]:
+        for c in filter_data[a][b]:
+            if c in service_dump:
+                DS_value = append_filter(a, b, service_dump)
+                DS.write(f'Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{a}" /v "{b}" /t REG_MULTI_SZ /d "{DS_value}" /f > NUL 2>&1\n')
+                ES_value = split_lines(read_value(f'SYSTEM\CurrentControlSet\Control\Class\{a}', b))
+                ES.write(f'Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{a}" /v "{b}" /t REG_MULTI_SZ /d "{ES_value}" /f > NUL 2>&1\n')
+                break
+
+for b in service_dump:
+    if read_value(f'SYSTEM\CurrentControlSet\Services\{b}', 'Start') != 'Not exists':
+        if b in automatic:
+            DS.write(f'Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\{b}" /v "Start" /t REG_DWORD /d "2" /f > NUL 2>&1\n')
+        elif b in manual:
+            DS.write(f'Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\{b}" /v "Start" /t REG_DWORD /d "3" /f > NUL 2>&1\n')
+        else:
+            DS.write(f'Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\{b}" /v "Start" /t REG_DWORD /d "4" /f > NUL 2>&1\n')
+        start_value = str(read_value(f'SYSTEM\CurrentControlSet\Services\{b}', 'Start'))
+        ES.write(f'Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\{b}" /v "Start" /t REG_DWORD /d "{start_value}" /f > NUL 2>&1\n')
+
+DS.write('shutdown /r /f /t 0\n')
+ES.write('shutdown /r /f /t 0\n')
+
+DS.close()
+ES.close()
