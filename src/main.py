@@ -47,6 +47,7 @@ parse_config('Manual_Services', manual)
 parse_config('Drivers_To_Disable', service_dump)
 parse_config('Toggle_Files_Folders', rename_folders_executables)
 
+
 statuses = win32service.EnumServicesStatus(win32service.OpenSCManager(None, None, win32con.GENERIC_READ))
 
 for (service_name, desc, status) in statuses:
@@ -76,7 +77,7 @@ with open('build/Services-Disable.bat', 'a') as DS:
             ES_value = split_lines(read_value('SYSTEM\CurrentControlSet\Control\Class\{4d36e967-e325-11ce-bfc1-08002be10318}', 'LowerFilters'))
             ES.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e967-e325-11ce-bfc1-08002be10318}" /v "LowerFilters" /t REG_MULTI_SZ /d "' + ES_value + '" /f > NUL 2>&1\n')
 
-        if 'fvevol' or 'iorate' or 'rdyboost' in service_dump:
+        if any(i in service_dump for i in ("fvevol", "iorate", "rdyboost")):
             DS_value = append_filter('{71a27cdd-812a-11d0-bec7-08002be2092f}', 'LowerFilters', service_dump)
             DS.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{71a27cdd-812a-11d0-bec7-08002be2092f}" /v "LowerFilters" /t REG_MULTI_SZ /d "' + DS_value + '" /f > NUL 2>&1\n')
             ES_value = split_lines(read_value('SYSTEM\CurrentControlSet\Control\Class\{71a27cdd-812a-11d0-bec7-08002be2092f}', 'LowerFilters'))
