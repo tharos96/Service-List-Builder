@@ -20,9 +20,9 @@ I am not responsible for damage caused to computer. This tool is powerful & for 
   ```
   Note: 
   
-  - All lists are case sensitive, ensure that the service names match those installed on the operating system
+  - All lists are case sensitive
 
-  - This tool does not handle service dependencies or driver filters
+  - This tool automatically handles driver filters for EhStorClass, fvevol, iorate, rdyboost, ksthunk and volsnap
 
   ```
 - Run main.exe to build the scripts. 
