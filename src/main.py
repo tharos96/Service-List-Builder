@@ -47,7 +47,6 @@ parse_config('Manual_Services', manual)
 parse_config('Drivers_To_Disable', service_dump)
 parse_config('Toggle_Files_Folders', rename_folders_executables)
 
-
 statuses = win32service.EnumServicesStatus(win32service.OpenSCManager(None, None, win32con.GENERIC_READ))
 
 for (service_name, desc, status) in statuses:
@@ -63,6 +62,25 @@ for script in scripts:
     if os.path.exists(script):
         os.remove(script)
 
+filter_data = {
+    '{4d36e967-e325-11ce-bfc1-08002be10318}': {
+        'LowerFilters': ['EhStorClass']
+    },
+    '{71a27cdd-812a-11d0-bec7-08002be2092f}': {
+        'LowerFilters': ['fvevol', 'iorate', 'rdyboost'],
+        'UpperFilters': ['volsnap']
+    },
+    '{4d36e96c-e325-11ce-bfc1-08002be10318}': {
+        'UpperFilters': ['ksthunk']
+    },
+    '{6bdd1fc6-810f-11d0-bec7-08002be2092f}': {
+        'UpperFilters': ['ksthunk']
+    },
+    '{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}': {
+        'UpperFilters': ['ksthunk']
+    }
+}
+
 with open('build/Services-Disable.bat', 'a') as DS:
     with open('build/Services-Enable.bat', 'a') as ES:
         DS.write('@echo off\n')
@@ -70,40 +88,15 @@ with open('build/Services-Disable.bat', 'a') as DS:
         for item in rename_folders_executables:
             DS.write('REN "' + item + '" "' + os.path.basename(item) + '_old" > NUL 2>&1\n')
             ES.write('REN "' + item + '_old" "' + os.path.basename(item) + '" > NUL 2>&1\n')
-
-        if 'EhStorClass' in service_dump:
-            DS_value = append_filter('{4d36e967-e325-11ce-bfc1-08002be10318}', 'LowerFilters', service_dump)
-            DS.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e967-e325-11ce-bfc1-08002be10318}" /v "LowerFilters" /t REG_MULTI_SZ /d "' + DS_value + '" /f > NUL 2>&1\n')
-            ES_value = split_lines(read_value('SYSTEM\CurrentControlSet\Control\Class\{4d36e967-e325-11ce-bfc1-08002be10318}', 'LowerFilters'))
-            ES.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e967-e325-11ce-bfc1-08002be10318}" /v "LowerFilters" /t REG_MULTI_SZ /d "' + ES_value + '" /f > NUL 2>&1\n')
-
-        if any(i in service_dump for i in ("fvevol", "iorate", "rdyboost")):
-            DS_value = append_filter('{71a27cdd-812a-11d0-bec7-08002be2092f}', 'LowerFilters', service_dump)
-            DS.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{71a27cdd-812a-11d0-bec7-08002be2092f}" /v "LowerFilters" /t REG_MULTI_SZ /d "' + DS_value + '" /f > NUL 2>&1\n')
-            ES_value = split_lines(read_value('SYSTEM\CurrentControlSet\Control\Class\{71a27cdd-812a-11d0-bec7-08002be2092f}', 'LowerFilters'))
-            ES.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{71a27cdd-812a-11d0-bec7-08002be2092f}" /v "LowerFilters" /t REG_MULTI_SZ /d "' + ES_value + '" /f > NUL 2>&1\n')
-
-        if 'ksthunk' in service_dump:
-            DS_value = append_filter('{4d36e96c-e325-11ce-bfc1-08002be10318}', 'UpperFilters', service_dump)
-            DS.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e96c-e325-11ce-bfc1-08002be10318}" /v "UpperFilters" /t REG_MULTI_SZ /d "' + DS_value + '" /f > NUL 2>&1\n')
-            ES_value = split_lines(read_value('SYSTEM\CurrentControlSet\Control\Class\{4d36e96c-e325-11ce-bfc1-08002be10318}', 'UpperFilters'))
-            ES.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e96c-e325-11ce-bfc1-08002be10318}" /v "UpperFilters" /t REG_MULTI_SZ /d "' + ES_value + '" /f > NUL 2>&1\n')
-
-            DS_value = append_filter('{6bdd1fc6-810f-11d0-bec7-08002be2092f}', 'UpperFilters', service_dump)
-            DS.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{6bdd1fc6-810f-11d0-bec7-08002be2092f}" /v "UpperFilters" /t REG_MULTI_SZ /d "' + DS_value + '" /f > NUL 2>&1\n')
-            ES_value = split_lines(read_value('SYSTEM\CurrentControlSet\Control\Class\{6bdd1fc6-810f-11d0-bec7-08002be2092f}', 'UpperFilters'))
-            ES.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{6bdd1fc6-810f-11d0-bec7-08002be2092f}" /v "UpperFilters" /t REG_MULTI_SZ /d "' + ES_value + '" /f > NUL 2>&1\n')
-
-            DS_value = append_filter('{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}', 'UpperFilters', service_dump)
-            DS.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}" /v "UpperFilters" /t REG_MULTI_SZ /d "' + DS_value + '" /f > NUL 2>&1\n')
-            ES_value = split_lines(read_value('SYSTEM\CurrentControlSet\Control\Class\{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}', 'UpperFilters'))
-            ES.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}" /v "UpperFilters" /t REG_MULTI_SZ /d "' + ES_value + '" /f > NUL 2>&1\n')
-        
-        if 'volsnap' in service_dump:
-            DS_value = append_filter('{71a27cdd-812a-11d0-bec7-08002be2092f}', 'UpperFilters', service_dump)
-            DS.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{71a27cdd-812a-11d0-bec7-08002be2092f}" /v "UpperFilters" /t REG_MULTI_SZ /d "' + DS_value + '" /f > NUL 2>&1\n')
-            ES_value = split_lines(read_value('SYSTEM\CurrentControlSet\Control\Class\{71a27cdd-812a-11d0-bec7-08002be2092f}', 'UpperFilters'))
-            ES.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{71a27cdd-812a-11d0-bec7-08002be2092f}" /v "UpperFilters" /t REG_MULTI_SZ /d "' + ES_value + '" /f > NUL 2>&1\n')
+        for a in filter_data:
+            for b in filter_data[a]:
+                for c in filter_data[a][b]:
+                    if c in service_dump:
+                        DS_value = append_filter(a, b, service_dump)
+                        DS.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\\' + a + '" /v "' + b + '" /t REG_MULTI_SZ /d "' + DS_value + '" /f > NUL 2>&1\n')
+                        ES_value = split_lines(read_value('SYSTEM\CurrentControlSet\Control\Class\\' + a, b))
+                        ES.write('Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\\' + a + '" /v "' + b + '" /t REG_MULTI_SZ /d "' + ES_value + '" /f > NUL 2>&1\n')
+                        break
         for b in service_dump:
             if read_value('SYSTEM\CurrentControlSet\Services\\' + b, 'Start') != 'Not exists':
                 if b in automatic:
