@@ -88,8 +88,10 @@ DS.write('@echo off\n')
 ES.write('@echo off\n')
 
 for item in rename_folders_executables:
-    DS.write(f'REN "{item}" "{os.path.basename(item)}_old" > NUL 2>&1\n')
-    ES.write(f'REN "{item}_old" "{os.path.basename(item)}" > NUL 2>&1\n')
+    file_name = os.path.basename(item)
+    last_index = item[-1]
+    DS.write(f'REN "{item}" "{file_name}{last_index}" > NUL 2>&1\n')
+    ES.write(f'REN "{item}{last_index}" "{file_name}" > NUL 2>&1\n')
 
 for a in filter_data:
     for b in filter_data[a]:
