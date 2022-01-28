@@ -50,8 +50,9 @@ parse_config('Toggle_Files_Folders', rename_folders_executables)
 statuses = win32service.EnumServicesStatus(win32service.OpenSCManager(None, None, win32con.GENERIC_READ))
 
 for (service_name, desc, status) in statuses:
-    if "_" in service_name and len(service_name) > 6 and service_name[-6] == '_':
-        service_name = service_name[:-6]
+    if '_' in service_name:
+        svc, _, suffix = service_name.rpartition("_")
+        service_name = svc
     if service_name not in service_dump:
         service_dump.append(service_name)
 
