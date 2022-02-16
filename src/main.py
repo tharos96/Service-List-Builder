@@ -96,13 +96,14 @@ for item in rename_folders_executables:
 
 for a in filter_data:
     for b in filter_data[a]:
-        for c in filter_data[a][b]:
-            if c in service_dump:
-                DS_value = append_filter(a, b, service_dump)
-                DS.write(f'Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{a}" /v "{b}" /t REG_MULTI_SZ /d "{DS_value}" /f > NUL 2>&1\n')
-                ES_value = split_lines(read_value(f'SYSTEM\CurrentControlSet\Control\Class\{a}', b))
-                ES.write(f'Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{a}" /v "{b}" /t REG_MULTI_SZ /d "{ES_value}" /f > NUL 2>&1\n')
-                break
+        if read_value(f'SYSTEM\CurrentControlSet\Control\Class\{a}', b) != 'Not exists':
+            for c in filter_data[a][b]:
+                if c in service_dump:
+                    DS_value = append_filter(a, b, service_dump)
+                    DS.write(f'Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{a}" /v "{b}" /t REG_MULTI_SZ /d "{DS_value}" /f > NUL 2>&1\n')
+                    ES_value = split_lines(read_value(f'SYSTEM\CurrentControlSet\Control\Class\{a}', b))
+                    ES.write(f'Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{a}" /v "{b}" /t REG_MULTI_SZ /d "{ES_value}" /f > NUL 2>&1\n')
+                    break
 
 for b in service_dump:
     if read_value(f'SYSTEM\CurrentControlSet\Services\{b}', 'Start') != 'Not exists':
