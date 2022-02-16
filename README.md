@@ -22,7 +22,13 @@ I am not responsible for damage caused to computer. This tool is powerful & for 
   
   - All lists are case sensitive
 
-  - This tool automatically handles driver filters for EhStorClass, fvevol, iorate, rdyboost, ksthunk and volsnap
+  - This tool automatically handles driver filters for  the following:
+    - EhStorClass
+    - fvevol
+    - iorate
+    - rdyboost
+    - ksthunk
+    - volsnap
 
   ```
 - Run main.exe to build the scripts. 
