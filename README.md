@@ -31,7 +31,7 @@ I am not responsible for damage caused to computer. This tool is powerful & for 
     - volsnap
 
   ```
-- Run main.exe to build the scripts. 
+- Pass lists.ini as an argument to main.exe to build the scripts through the commandline or by dragging and dropping the ini onto the binary. 
 
 - The scripts will be built in the ``build`` folder. Nsudo is required to run the scripts with with "Enable All Privilages" checkbox enabled to prevent errors when writing to registry & renaming files.
 
