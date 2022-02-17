@@ -33,10 +33,10 @@ I am not responsible for damage caused to computer. This tool is powerful & for 
   ```
 - Pass lists.ini as an argument to main.exe to build the scripts through the commandline or by dragging and dropping the ini onto the binary. 
 
-- The scripts will be built in the ``build`` folder. Nsudo is required to run the scripts with with "Enable All Privilages" checkbox enabled to prevent errors when writing to registry & renaming files.
+- The scripts will be built in the ``build`` folder. [NSudo](https://github.com/M2Team/NSudo) is required to run the scripts with with "Enable All Privilages" checkbox enabled to prevent errors when writing to registry & renaming files.
 
 ## Example
 
-- After running ``Services-Disable.bat`` with Nsudo, all services except those that i defined in the lists will be disabled. (This list was used on Windows 10 1709)
+- After running ``Services-Disable.bat`` with all privilages, all services except those that i defined in the lists will be disabled. (This list was used on Windows 10 1709)
 
     <img src="./img/lists.png" width="1000"> 
