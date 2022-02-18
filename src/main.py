@@ -101,8 +101,8 @@ ES.write('@echo off\n')
 for item in rename_folders_executables:
     file_name = os.path.basename(item)
     last_index = item[-1]
-    DS.write(f'REN "{item}" "{file_name}{last_index}" > NUL 2>&1\n')
-    ES.write(f'REN "{item}{last_index}" "{file_name}" > NUL 2>&1\n')
+    DS.write(f'REN "{item}" "{file_name}{last_index}"\n')
+    ES.write(f'REN "{item}{last_index}" "{file_name}"\n')
 
 for filter in filter_dict:
     for filtertype in filter_dict[filter]:
@@ -110,21 +110,21 @@ for filter in filter_dict:
             for driver in filter_dict[filter][filtertype]:
                 if driver in service_dump:
                     DS_value = append_filter(filter, filtertype, service_dump)
-                    DS.write(f'Reg.exe add "HKLM\{class_hive}\{filter}" /v "{filtertype}" /t REG_MULTI_SZ /d "{DS_value}" /f > NUL 2>&1\n')
+                    DS.write(f'Reg.exe add "HKLM\{class_hive}\{filter}" /v "{filtertype}" /t REG_MULTI_SZ /d "{DS_value}" /f\n')
                     ES_value = split_lines(read_value(f'{class_hive}\{filter}', filtertype))
-                    ES.write(f'Reg.exe add "HKLM\{class_hive}\{filter}" /v "{filtertype}" /t REG_MULTI_SZ /d "{ES_value}" /f > NUL 2>&1\n')
+                    ES.write(f'Reg.exe add "HKLM\{class_hive}\{filter}" /v "{filtertype}" /t REG_MULTI_SZ /d "{ES_value}" /f\n')
                     break
 
 for item in service_dump:
     if read_value(f'{services_hive}\{item}', 'Start') != None:
         if item in automatic:
-            DS.write(f'Reg.exe add "HKLM\{services_hive}\{item}" /v "Start" /t REG_DWORD /d "2" /f > NUL 2>&1\n')
+            DS.write(f'Reg.exe add "HKLM\{services_hive}\{item}" /v "Start" /t REG_DWORD /d "2" /f\n')
         elif item in manual:
-            DS.write(f'Reg.exe add "HKLM\{services_hive}\{item}" /v "Start" /t REG_DWORD /d "3" /f > NUL 2>&1\n')
+            DS.write(f'Reg.exe add "HKLM\{services_hive}\{item}" /v "Start" /t REG_DWORD /d "3" /f\n')
         else:
-            DS.write(f'Reg.exe add "HKLM\{services_hive}\{item}" /v "Start" /t REG_DWORD /d "4" /f > NUL 2>&1\n')
+            DS.write(f'Reg.exe add "HKLM\{services_hive}\{item}" /v "Start" /t REG_DWORD /d "4" /f\n')
         start_value = str(read_value(f'{services_hive}\{item}', 'Start'))
-        ES.write(f'Reg.exe add "HKLM\{services_hive}\{item}" /v "Start" /t REG_DWORD /d "{start_value}" /f > NUL 2>&1\n')
+        ES.write(f'Reg.exe add "HKLM\{services_hive}\{item}" /v "Start" /t REG_DWORD /d "{start_value}" /f\n')
 
 DS.write('shutdown /r /f /t 0\n')
 ES.write('shutdown /r /f /t 0\n')
