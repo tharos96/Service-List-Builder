@@ -3,10 +3,10 @@ from configparser import ConfigParser
 
 if len(sys.argv) < 2:
     print('invalid arguments')
-    exit()
+    sys.exit()
 elif len(sys.argv) > 2:
     print('too many arguments')
-    exit()
+    sys.exit()
 
 class_hive = 'SYSTEM\CurrentControlSet\Control\Class'
 services_hive = 'SYSTEM\CurrentControlSet\Services'
