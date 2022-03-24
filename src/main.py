@@ -4,11 +4,7 @@ from configparser import ConfigParser
 class_hive = 'SYSTEM\CurrentControlSet\Control\Class'
 services_hive = 'SYSTEM\CurrentControlSet\Services'
 
-def parse_config(section, array_name):
-    config = ConfigParser(allow_no_value=True, delimiters=('='))
-    # prevent lists imported as lowercase
-    config.optionxform = str
-    config.read(sys.argv[1])
+def parse_config(section, array_name, config):
     for i in config[section]:
         if i != '' and i not in array_name:
             array_name.append(i)
@@ -41,15 +37,20 @@ def read_value(path, value_name):
         return None
 
 def main():
+    config = ConfigParser(allow_no_value=True, delimiters=('='))
+    # prevent lists imported as lowercase
+    config.optionxform = str
+    config.read(sys.argv[1])
+
     automatic = []
     manual = []
     service_dump = []
     rename_folders_executables = []
 
-    parse_config('Automatic_Services', automatic)
-    parse_config('Manual_Services', manual)
-    parse_config('Drivers_To_Disable', service_dump)
-    parse_config('Toggle_Files_Folders', rename_folders_executables)
+    parse_config('Automatic_Services', automatic, config)
+    parse_config('Manual_Services', manual, config)
+    parse_config('Drivers_To_Disable', service_dump, config)
+    parse_config('Toggle_Files_Folders', rename_folders_executables, config)
 
     statuses = win32service.EnumServicesStatus(win32service.OpenSCManager(None, None, win32con.GENERIC_READ))
 
