@@ -1,16 +1,5 @@
-import win32con, win32service, winreg, os, sys, ctypes
+import win32con, win32service, winreg, os, sys
 from configparser import ConfigParser
-
-if ctypes.windll.shell32.IsUserAnAdmin() == False:
-    print('Administrator privileges required.')
-    sys.exit()
-
-if len(sys.argv) < 2:
-    print('invalid arguments')
-    sys.exit()
-elif len(sys.argv) > 2:
-    print('too many arguments')
-    sys.exit()
 
 class_hive = 'SYSTEM\CurrentControlSet\Control\Class'
 services_hive = 'SYSTEM\CurrentControlSet\Services'
