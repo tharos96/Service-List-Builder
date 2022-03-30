@@ -100,14 +100,14 @@ def main():
         ES.write(f'REN "{item}{last_index}" "{file_name}"\n')
 
     for filter in filter_dict:
-        for filtertype in filter_dict[filter]:
-            if read_value(f'{class_hive}\{filter}', filtertype) != None:
-                for driver in filter_dict[filter][filtertype]:
+        for filter_type in filter_dict[filter]:
+            if read_value(f'{class_hive}\{filter}', filter_type) != None:
+                for driver in filter_dict[filter][filter_type]:
                     if driver in service_dump:
-                        DS_value = append_filter(filter, filtertype, service_dump)
-                        DS.write(f'Reg.exe add "HKLM\{class_hive}\{filter}" /v "{filtertype}" /t REG_MULTI_SZ /d "{DS_value}" /f\n')
-                        ES_value = split_lines(read_value(f'{class_hive}\{filter}', filtertype))
-                        ES.write(f'Reg.exe add "HKLM\{class_hive}\{filter}" /v "{filtertype}" /t REG_MULTI_SZ /d "{ES_value}" /f\n')
+                        DS_value = append_filter(filter, filter_type, service_dump)
+                        DS.write(f'Reg.exe add "HKLM\{class_hive}\{filter}" /v "{filter_type}" /t REG_MULTI_SZ /d "{DS_value}" /f\n')
+                        ES_value = split_lines(read_value(f'{class_hive}\{filter}', filter_type))
+                        ES.write(f'Reg.exe add "HKLM\{class_hive}\{filter}" /v "{filter_type}" /t REG_MULTI_SZ /d "{ES_value}" /f\n')
                         break
 
     for item in service_dump:
