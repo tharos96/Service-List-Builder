@@ -11,11 +11,11 @@ I am not responsible for damage caused to computer. This tool is powerful & for 
 
 - Open lists.ini in a text editor.
 
-- [Required] Import your service list seperated by new lines under the ``[Automatic_Services]`` and ``[Manual_Services]`` sections. Whatever services you do not specify under these fields will get disabled.
+- You can import your service list seperated by new lines under the ``[Automatic_Services]`` and ``[Manual_Services]`` sections. Whatever services you do not specify under these fields will get disabled.
 
-- [Optional] Additionally You can also import a list of drivers to be disabled seperated by new lines under the ``[Drivers_To_Disable]`` section.
+- Additionally you can also import a list of drivers to be disabled seperated by new lines under the ``[Drivers_To_Disable]`` section.
 
-- [Optional] Additionally you can include full folder paths or binaries (without quotes) to get renamed to _old under the ``[Toggle_Files_Folders]``.
+- Additionally you can include full folder paths or binaries (without quotes) to get renamed to _old under the ``[Toggle_Files_Folders]``.
 
   ```
   Note: 
@@ -23,6 +23,7 @@ I am not responsible for damage caused to computer. This tool is powerful & for 
   - All lists are case sensitive
 
   - This tool automatically handles driver filters for  the following:
+  
     - EhStorClass
     - fvevol
     - iorate
@@ -31,7 +32,7 @@ I am not responsible for damage caused to computer. This tool is powerful & for 
     - volsnap
 
   ```
-- Pass lists.ini as an argument to main.exe to build the scripts through the commandline or by dragging and dropping the ini onto the binary. 
+- Pass lists.ini as an argument to main.exe to build the scripts through the command-line or by dragging and dropping the ini onto the binary. 
 
 - The scripts will be built in the ``build`` folder. [NSudo](https://github.com/M2Team/NSudo) is required to run the scripts with with "Enable All Privilages" checkbox enabled to prevent errors when writing to registry & renaming files.
 

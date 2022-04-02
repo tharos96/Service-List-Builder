@@ -3,6 +3,9 @@ from configparser import ConfigParser
 
 class_hive = 'SYSTEM\CurrentControlSet\Control\Class'
 services_hive = 'SYSTEM\CurrentControlSet\Services'
+config = ConfigParser(allow_no_value=True, delimiters=('='))
+# prevent lists imported as lowercase
+config.optionxform = str
 
 def parse_config(section, array_name, config):
     for i in config[section]:
@@ -37,9 +40,6 @@ def read_value(path, value_name):
         return None
 
 def main():
-    config = ConfigParser(allow_no_value=True, delimiters=('='))
-    # prevent lists imported as lowercase
-    config.optionxform = str
     config.read(sys.argv[1])
 
     automatic = []
@@ -54,12 +54,13 @@ def main():
 
     statuses = win32service.EnumServicesStatus(win32service.OpenSCManager(None, None, win32con.GENERIC_READ))
 
-    for (service_name, desc, status) in statuses:
-        if '_' in service_name:
-            svc, _, suffix = service_name.rpartition("_")
-            service_name = svc
-        if service_name not in service_dump:
-            service_dump.append(service_name)
+    if len(automatic) > 0 or len(manual) > 0:
+        for (service_name, desc, status) in statuses:
+            if '_' in service_name:
+                svc, _, suffix = service_name.rpartition("_")
+                service_name = svc
+            if service_name not in service_dump:
+                service_dump.append(service_name)
 
     service_dump = sorted(service_dump, key=str.lower)
 
