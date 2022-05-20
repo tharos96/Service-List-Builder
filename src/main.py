@@ -1,27 +1,28 @@
+from __future__ import annotations
 import win32con, win32service, winreg, os, sys
 from configparser import ConfigParser
 
-class_hive = 'SYSTEM\CurrentControlSet\Control\Class'
-services_hive = 'SYSTEM\CurrentControlSet\Services'
+class_hive = 'SYSTEM\\CurrentControlSet\\Control\\Class'
+services_hive = 'SYSTEM\\CurrentControlSet\\Services'
 config = ConfigParser(allow_no_value=True, delimiters=('='))
 # prevent lists imported as lowercase
-config.optionxform = str
+config.optionxform = str #type: ignore
 
-def parse_config(section, array_name, config):
+def parse_config(section: str, array_name: list, config: ConfigParser) -> None:
     for i in config[section]:
         if i != '' and i not in array_name:
             array_name.append(i)
 
-def append_filter(filter, filtertype, arr_name):
+def append_filter(filter: str, filtertype: str, arr_name: list) -> str:
     key_data = []
-    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, f'{class_hive}\{filter}', 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
+    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, f'{class_hive}\\{filter}', 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
         key_data = winreg.QueryValueEx(key, filtertype)[0]
         for i in arr_name:
             if i in key_data:
                 key_data.remove(i)
     return split_lines(key_data)
 
-def split_lines(arr_name): 
+def split_lines(arr_name: list) -> str: 
     string = ''
     for i in arr_name:
         string += i
@@ -29,7 +30,7 @@ def split_lines(arr_name):
             string += '\\0'
     return string
 
-def read_value(path, value_name):
+def read_value(path: str, value_name: str) -> list | None:
     try:
         with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path, 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
             try:
@@ -52,7 +53,7 @@ def main():
     parse_config('Drivers_To_Disable', service_dump, config)
     parse_config('Toggle_Files_Folders', rename_folders_executables, config)
 
-    statuses = win32service.EnumServicesStatus(win32service.OpenSCManager(None, None, win32con.GENERIC_READ))
+    statuses = win32service.EnumServicesStatus(win32service.OpenSCManager(None, None, win32con.GENERIC_READ)) #type: ignore
 
     if len(automatic) > 0 or len(manual) > 0:
         for (service_name, desc, status) in statuses:
@@ -102,25 +103,25 @@ def main():
 
     for filter in filter_dict:
         for filter_type in filter_dict[filter]:
-            if read_value(f'{class_hive}\{filter}', filter_type) != None:
+            if read_value(f'{class_hive}\\{filter}', filter_type) != None:
                 for driver in filter_dict[filter][filter_type]:
                     if driver in service_dump:
                         DS_value = append_filter(filter, filter_type, service_dump)
-                        DS_lines.append(f'Reg.exe add "HKLM\{class_hive}\{filter}" /v "{filter_type}" /t REG_MULTI_SZ /d "{DS_value}" /f')
-                        ES_value = split_lines(read_value(f'{class_hive}\{filter}', filter_type))
-                        ES_lines.append(f'Reg.exe add "HKLM\{class_hive}\{filter}" /v "{filter_type}" /t REG_MULTI_SZ /d "{ES_value}" /f')
+                        DS_lines.append(f'Reg.exe add "HKLM\\{class_hive}\\{filter}" /v "{filter_type}" /t REG_MULTI_SZ /d "{DS_value}" /f')
+                        ES_value = split_lines(read_value(f'{class_hive}\\{filter}', filter_type)) #type: ignore
+                        ES_lines.append(f'Reg.exe add "HKLM\\{class_hive}\\{filter}" /v "{filter_type}" /t REG_MULTI_SZ /d "{ES_value}" /f')
                         break
 
     for item in service_dump:
-        if read_value(f'{services_hive}\{item}', 'Start') != None:
+        if read_value(f'{services_hive}\\{item}', 'Start') != None:
             if item in automatic:
-                DS_lines.append(f'Reg.exe add "HKLM\{services_hive}\{item}" /v "Start" /t REG_DWORD /d "2" /f')
+                DS_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "2" /f')
             elif item in manual:
-                DS_lines.append(f'Reg.exe add "HKLM\{services_hive}\{item}" /v "Start" /t REG_DWORD /d "3" /f')
+                DS_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "3" /f')
             else:
-                DS_lines.append(f'Reg.exe add "HKLM\{services_hive}\{item}" /v "Start" /t REG_DWORD /d "4" /f')
-            start_value = str(read_value(f'{services_hive}\{item}', 'Start'))
-            ES_lines.append(f'Reg.exe add "HKLM\{services_hive}\{item}" /v "Start" /t REG_DWORD /d "{start_value}" /f')
+                DS_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "4" /f')
+            start_value = str(read_value(f'{services_hive}\\{item}', 'Start'))
+            ES_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "{start_value}" /f')
 
     DS_lines.append('shutdown /r /f /t 0')
     ES_lines.append('shutdown /r /f /t 0')
