@@ -52,8 +52,10 @@ def main():
     parse_config('Manual_Services', manual, config)
     parse_config('Drivers_To_Disable', service_dump, config)
     parse_config('Toggle_Files_Folders', rename_folders_executables, config)
-
-    statuses = win32service.EnumServicesStatus(win32service.OpenSCManager(None, None, win32con.GENERIC_READ)) #type: ignore
+    
+    statuses = win32service.EnumServicesStatus(
+        win32service.OpenSCManager(None, None, win32con.GENERIC_READ) #type: ignore
+    ) 
 
     if len(automatic) > 0 or len(manual) > 0:
         for (service_name, desc, status) in statuses:
@@ -89,49 +91,49 @@ def main():
         }
     }
 
-    DS_lines = []
-    ES_lines = []
+    ds_lines = []
+    es_lines = []
 
-    DS_lines.append('@echo off')
-    ES_lines.append('@echo off')
+    ds_lines.append('@echo off')
+    es_lines.append('@echo off')
 
     for item in rename_folders_executables:
         file_name = os.path.basename(item)
         last_index = item[-1]
-        DS_lines.append(f'REN "{item}" "{file_name}{last_index}"')
-        ES_lines.append(f'REN "{item}{last_index}" "{file_name}"')
+        ds_lines.append(f'REN "{item}" "{file_name}{last_index}"')
+        es_lines.append(f'REN "{item}{last_index}" "{file_name}"')
 
     for filter in filter_dict:
         for filter_type in filter_dict[filter]:
-            if read_value(f'{class_hive}\\{filter}', filter_type) != None:
+            if read_value(f'{class_hive}\\{filter}', filter_type) is not None:
                 for driver in filter_dict[filter][filter_type]:
                     if driver in service_dump:
                         DS_value = append_filter(filter, filter_type, service_dump)
-                        DS_lines.append(f'Reg.exe add "HKLM\\{class_hive}\\{filter}" /v "{filter_type}" /t REG_MULTI_SZ /d "{DS_value}" /f')
+                        ds_lines.append(f'Reg.exe add "HKLM\\{class_hive}\\{filter}" /v "{filter_type}" /t REG_MULTI_SZ /d "{DS_value}" /f')
                         ES_value = split_lines(read_value(f'{class_hive}\\{filter}', filter_type)) #type: ignore
-                        ES_lines.append(f'Reg.exe add "HKLM\\{class_hive}\\{filter}" /v "{filter_type}" /t REG_MULTI_SZ /d "{ES_value}" /f')
+                        es_lines.append(f'Reg.exe add "HKLM\\{class_hive}\\{filter}" /v "{filter_type}" /t REG_MULTI_SZ /d "{ES_value}" /f')
                         break
 
     for item in service_dump:
-        if read_value(f'{services_hive}\\{item}', 'Start') != None:
+        if read_value(f'{services_hive}\\{item}', 'Start') is not None:
             if item in automatic:
-                DS_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "2" /f')
+                ds_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "2" /f')
             elif item in manual:
-                DS_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "3" /f')
+                ds_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "3" /f')
             else:
-                DS_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "4" /f')
+                ds_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "4" /f')
             start_value = str(read_value(f'{services_hive}\\{item}', 'Start'))
-            ES_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "{start_value}" /f')
+            es_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "{start_value}" /f')
 
-    DS_lines.append('shutdown /r /f /t 0')
-    ES_lines.append('shutdown /r /f /t 0')
+    ds_lines.append('shutdown /r /f /t 0')
+    es_lines.append('shutdown /r /f /t 0')
 
     with open('build/Services-Disable.bat', 'a') as DS:
-        for line in DS_lines:
+        for line in ds_lines:
             DS.write(f'{line}\n')
 
     with open('build/Services-Enable.bat', 'a') as ES:
-        for line in ES_lines:
+        for line in es_lines:
             ES.write(f'{line}\n')
 
 if __name__ == '__main__':
