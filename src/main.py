@@ -94,14 +94,22 @@ def main():
             os.remove(script)
 
     filter_dict = {
-        "{4d36e967-e325-11ce-bfc1-08002be10318}": {"LowerFilters": ["EhStorClass"]},
-        "{71a27cdd-812a-11d0-bec7-08002be2092f}": {
-            "LowerFilters": ["fvevol", "iorate", "rdyboost"],
-            "UpperFilters": ["volsnap"],
+        '{4d36e967-e325-11ce-bfc1-08002be10318}': {
+            'LowerFilters': ['EhStorClass']
         },
-        "{4d36e96c-e325-11ce-bfc1-08002be10318}": {"UpperFilters": ["ksthunk"]},
-        "{6bdd1fc6-810f-11d0-bec7-08002be2092f}": {"UpperFilters": ["ksthunk"]},
-        "{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}": {"UpperFilters": ["ksthunk"]},
+        '{71a27cdd-812a-11d0-bec7-08002be2092f}': {
+            'LowerFilters': ['fvevol', 'iorate', 'rdyboost'],
+            'UpperFilters': ['volsnap']
+        },
+        '{4d36e96c-e325-11ce-bfc1-08002be10318}': {
+            'UpperFilters': ['ksthunk']
+        },
+        '{6bdd1fc6-810f-11d0-bec7-08002be2092f}': {
+            'UpperFilters': ['ksthunk']
+        },
+        '{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}': {
+            'UpperFilters': ['ksthunk']
+        }
     }
 
     ds_lines = []
@@ -131,24 +139,19 @@ def main():
                         )
                         break
 
+    ds_start_value = 0
     for item in service_dump:
         if read_value(f"{SERVICES_HIVE}\\{item}", "Start") is not None:
             if item in automatic:
-                ds_lines.append(
-                    f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "2" /f'
-                )
+                ds_start_value = 2
             elif item in manual:
-                ds_lines.append(
-                    f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "3" /f'
-                )
+                ds_start_value = 3
             else:
-                ds_lines.append(
-                    f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "4" /f'
-                )
-            start_value = str(read_value(f"{SERVICES_HIVE}\\{item}", "Start"))
-            es_lines.append(
-                f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "{start_value}" /f'
-            )
+                ds_start_value = 4
+            ds_lines.append(f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "{ds_start_value}" /f')
+            
+            es_start_value = str(read_value(f"{SERVICES_HIVE}\\{item}", "Start"))
+            es_lines.append(f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "{es_start_value}" /f')
 
     ds_lines.append("shutdown /r /f /t 0")
     es_lines.append("shutdown /r /f /t 0")
