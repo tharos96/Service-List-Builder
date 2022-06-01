@@ -1,1 +1,2 @@
+pyinstaller==5.1
 pypiwin32==223

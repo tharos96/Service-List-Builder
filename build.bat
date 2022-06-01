@@ -46,10 +46,6 @@ call "%BUILD_ENV%\Scripts\deactivate.bat"
 
 cd "%CURRENT_DIR%"
 
-if exist "%PUBLISH_DIR%" (
-    rd /s /q "%PUBLISH_DIR%"
-)
-
 xcopy /s /i /e "%CURRENT_DIR%\src" "%PUBLISH_DIR%"
 del /f /q "%PUBLISH_DIR%\main.py"
 move "%PROJECT_DIR%\dist\main.exe" "%PUBLISH_DIR%"
