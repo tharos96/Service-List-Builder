@@ -57,20 +57,20 @@ def read_value(path: str, value_name: str) -> list | None:
         return None
 
 
-def print_usage():
+def print_usage() -> None:
     print("Usage: main [OPTIONS]\n")
     print("\t-h\tShow this help message and exit")
     print("\t<file>\tPass lists.ini configuration file to program")
-    sys.exit()
 
 
-def main():
+def main() -> int:
     """Main application logic"""
     argc = len(sys.argv)
     argv = sys.argv
 
     if argc != 2 or "-h" in argv:
         print_usage()
+        return 1
 
     config = ConfigParser(allow_no_value=True, delimiters=("="))
     # prevent lists imported as lowercase
@@ -176,7 +176,9 @@ def main():
     with open("build/Services-Enable.bat", "a", encoding="UTF-8") as es:
         for line in es_lines:
             es.write(f"{line}\n")
+    
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
