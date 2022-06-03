@@ -8,9 +8,6 @@ import win32service
 
 CLASS_HIVE = "SYSTEM\\CurrentControlSet\\Control\\Class"
 SERVICES_HIVE = "SYSTEM\\CurrentControlSet\\Services"
-config = ConfigParser(allow_no_value=True, delimiters=("="))
-# prevent lists imported as lowercase
-config.optionxform = str  # type: ignore
 
 
 def parse_config(section: str, array_name: list, cfg: ConfigParser) -> None:
@@ -60,8 +57,24 @@ def read_value(path: str, value_name: str) -> list | None:
         return None
 
 
+def print_usage():
+    print("Usage: main [OPTIONS]\n")
+    print("\t-h\tShow this help message and exit")
+    print("\t<file>\tPass lists.ini configuration file to program")
+    sys.exit()
+
+
 def main():
     """Main application logic"""
+    argc = len(sys.argv)
+    argv = sys.argv
+
+    if argc != 2 or "-h" in argv:
+        print_usage()
+
+    config = ConfigParser(allow_no_value=True, delimiters=("="))
+    # prevent lists imported as lowercase
+    config.optionxform = str  # type: ignore
     config.read(sys.argv[1])
 
     automatic = []
@@ -149,7 +162,7 @@ def main():
             else:
                 ds_start_value = 4
             ds_lines.append(f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "{ds_start_value}" /f')
-            
+
             es_start_value = str(read_value(f"{SERVICES_HIVE}\\{item}", "Start"))
             es_lines.append(f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "{es_start_value}" /f')
 
