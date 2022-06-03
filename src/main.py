@@ -70,7 +70,7 @@ def main() -> int:
 
     if argc != 2 or "-h" in argv:
         print_usage()
-        return 1
+        return 0
 
     config = ConfigParser(allow_no_value=True, delimiters=("="))
     # prevent lists imported as lowercase
