@@ -68,6 +68,14 @@ def main() -> int:
     argc = len(sys.argv)
     argv = sys.argv
 
+    # change directory to location of program
+    program_path = ""
+    if getattr(sys, 'frozen', False):
+        program_path = os.path.dirname(sys.executable)
+    elif __file__:
+        program_path = os.path.dirname(__file__)
+    os.chdir(program_path)
+
     if argc != 2 or "-h" in argv:
         print_usage()
         return 0
@@ -176,9 +184,9 @@ def main() -> int:
     with open("build/Services-Enable.bat", "a", encoding="UTF-8") as es:
         for line in es_lines:
             es.write(f"{line}\n")
-    
+
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())
