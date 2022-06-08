@@ -58,9 +58,10 @@ def read_value(path: str, value_name: str) -> list | None:
 
 
 def print_usage() -> None:
-    print("Usage: main [OPTIONS]\n")
-    print("\t-h\tShow this help message and exit")
-    print("\t<file>\tPass lists.ini configuration file to program")
+    """Prints program usage message"""
+    print("usage: service-list-builder.exe [OPTIONS] file\n")
+    print("\t-h\tshow this help message and exit")
+    print("\tfile\tpass lists.ini configuration file to program")
 
 
 def main() -> int:

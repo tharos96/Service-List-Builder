@@ -37,18 +37,18 @@ call "%BUILD_ENV%\Scripts\activate.bat"
 
 pip install -r requirements.txt
 
-copy /y "%CURRENT_DIR%\src\main.py" "%PROJECT_DIR%"
+copy /y "%CURRENT_DIR%\src\service-list-builder.py" "%PROJECT_DIR%"
 cd "%PROJECT_DIR%"
 
-pyinstaller "main.py" --onefile --uac-admin
+pyinstaller "service-list-builder.py" --onefile --uac-admin
 
 call "%BUILD_ENV%\Scripts\deactivate.bat"
 
 cd "%CURRENT_DIR%"
 
 xcopy /s /i /e "%CURRENT_DIR%\src" "%PUBLISH_DIR%"
-del /f /q "%PUBLISH_DIR%\main.py"
-move "%PROJECT_DIR%\dist\main.exe" "%PUBLISH_DIR%"
+del /f /q "%PUBLISH_DIR%\service-list-builder.py"
+move "%PROJECT_DIR%\dist\service-list-builder.exe" "%PUBLISH_DIR%"
 
 7z a -tzip "Service-List-Builder.zip" "%PUBLISH_DIR%"
 
