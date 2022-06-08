@@ -64,7 +64,7 @@ def print_usage() -> None:
 
 
 def main() -> int:
-    """Main application logic"""
+    """CLI Entrypoint"""
     argc = len(sys.argv)
     argv = sys.argv
 
