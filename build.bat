@@ -50,6 +50,9 @@ xcopy /s /i /e "%CURRENT_DIR%\src" "%PUBLISH_DIR%"
 del /f /q "%PUBLISH_DIR%\service-list-builder.py"
 move "%PROJECT_DIR%\dist\service-list-builder.exe" "%PUBLISH_DIR%"
 
+if exist "Service-List-Builder.zip" (
+    del /f /q "Service-List-Builder.zip"
+)
 7z a -tzip "Service-List-Builder.zip" "%PUBLISH_DIR%"
 
 rd /s /q "%BUILD_ENV%"
