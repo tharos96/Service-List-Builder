@@ -143,8 +143,8 @@ def main() -> int:
     for item in rename_folders_executables:
         file_name = os.path.basename(item)
         last_index = item[-1]
-        ds_lines.append(f"REN '{item}'' '{file_name}{last_index}'")
-        es_lines.append(f"REN '{item}{last_index}' '{file_name}'")
+        ds_lines.append(f'REN "{item}" "{file_name}{last_index}"')
+        es_lines.append(f'REN "{item}{last_index}" "{file_name}"')
 
     for filter_name in filter_dict:
         for filter_type in filter_dict[filter_name]:
