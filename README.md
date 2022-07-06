@@ -32,7 +32,11 @@ I am not responsible for damage caused to computer. This tool is powerful & for 
     - volsnap
 
   ```
-- Pass lists.ini as an argument to ``service-list-builder.exe`` to build the scripts through the command-line or by dragging and dropping the ini onto the binary. 
+- Pass lists.ini as an argument to the program through the command-line with the command below to build the scripts.
+
+  ```bat
+  service-list-builder --config "lists.ini"
+  ```
 
 - The scripts will be built in the ``build`` folder. [NSudo](https://github.com/M2Team/NSudo) is required to run the scripts with with "Enable All Privilages" checkbox enabled to prevent errors when writing to registry & renaming files.
 

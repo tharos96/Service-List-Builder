@@ -3,6 +3,7 @@ import winreg
 import os
 import sys
 from configparser import ConfigParser
+import argparse
 import win32con
 import win32service
 
@@ -57,34 +58,35 @@ def read_value(path: str, value_name: str) -> list | None:
         return None
 
 
-def print_usage() -> None:
-    """Prints program usage message"""
-    print("usage: service-list-builder.exe [OPTIONS] file\n")
-    print("\t-h\tshow this help message and exit")
-    print("\tfile\tpass lists.ini configuration file to program")
-
-
 def main() -> int:
     """CLI Entrypoint"""
-    argc = len(sys.argv)
-    argv = sys.argv
+
+    version = "0.3.0"
+
+    parser = argparse.ArgumentParser(description=f"service-list-builder v{version}")
+
+    parser.add_argument(
+        "--config",
+        metavar="<config>",
+        type=str,
+        help="path to lists config file",
+        required=True
+    )
+
+    args = parser.parse_args()
 
     # change directory to location of program
     program_path = ""
-    if getattr(sys, 'frozen', False):
+    if getattr(sys, "frozen", False):
         program_path = os.path.dirname(sys.executable)
     elif __file__:
         program_path = os.path.dirname(__file__)
     os.chdir(program_path)
 
-    if argc != 2 or "-h" in argv:
-        print_usage()
-        return 0
-
     config = ConfigParser(allow_no_value=True, delimiters=("="))
     # prevent lists imported as lowercase
     config.optionxform = str  # type: ignore
-    config.read(sys.argv[1])
+    config.read(args.config)
 
     automatic = []
     manual = []
@@ -170,10 +172,14 @@ def main() -> int:
                 ds_start_value = 3
             else:
                 ds_start_value = 4
-            ds_lines.append(f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "{ds_start_value}" /f')
+            ds_lines.append(
+                f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "{ds_start_value}" /f'
+            )
 
             es_start_value = str(read_value(f"{SERVICES_HIVE}\\{item}", "Start"))
-            es_lines.append(f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "{es_start_value}" /f')
+            es_lines.append(
+                f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "{es_start_value}" /f'
+            )
 
     ds_lines.append("shutdown /r /f /t 0")
     es_lines.append("shutdown /r /f /t 0")
