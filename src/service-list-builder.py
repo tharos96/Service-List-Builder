@@ -61,7 +61,7 @@ def read_value(path: str, value_name: str) -> list | None:
 def main() -> int:
     """CLI Entrypoint"""
 
-    version = "0.3.0"
+    version = "0.3.1"
 
     parser = argparse.ArgumentParser(description=f"service-list-builder v{version}")
 
