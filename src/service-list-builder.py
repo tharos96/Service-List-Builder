@@ -143,10 +143,13 @@ def main() -> int:
     es_lines.append("@echo off")
 
     for item in rename_folders_executables:
-        file_name = os.path.basename(item)
-        last_index = item[-1]
-        ds_lines.append(f'REN "{item}" "{file_name}{last_index}"')
-        es_lines.append(f'REN "{item}{last_index}" "{file_name}"')
+        if os.path.exists(item):
+            file_name = os.path.basename(item)
+            last_index = item[-1]
+            ds_lines.append(f'REN "{item}" "{file_name}{last_index}"')
+            es_lines.append(f'REN "{item}{last_index}" "{file_name}"')
+        else:
+            print(f"info: item does not exist: {item}")
 
     for filter_name in filter_dict:
         for filter_type in filter_dict[filter_name]:
