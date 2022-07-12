@@ -83,6 +83,10 @@ def main() -> int:
         program_path = os.path.dirname(__file__)
     os.chdir(program_path)
 
+    if not os.path.exists(args.config):
+        print("error: config file not found")
+        return 1
+
     config = ConfigParser(allow_no_value=True, delimiters=("="))
     # prevent lists imported as lowercase
     config.optionxform = str  # type: ignore
