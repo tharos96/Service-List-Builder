@@ -116,8 +116,7 @@ def main() -> int:
 
     service_dump = sorted(service_dump, key=str.lower)
 
-    scripts = ["build/Services-Disable.bat", "build/Services-Enable.bat"]
-    for script in scripts:
+    for script in ["build\\Services-Disable.bat", "build\\Services-Enable.bat"]:
         if os.path.exists(script):
             os.remove(script)
 
@@ -191,13 +190,15 @@ def main() -> int:
     ds_lines.append("shutdown /r /f /t 0")
     es_lines.append("shutdown /r /f /t 0")
 
-    with open("build/Services-Disable.bat", "a", encoding="UTF-8") as disable_script:
+    with open("build\\Services-Disable.bat", "a", encoding="UTF-8") as disable_script:
         for line in ds_lines:
             disable_script.write(f"{line}\n")
 
-    with open("build/Services-Enable.bat", "a", encoding="UTF-8") as enable_script:
+    with open("build\\Services-Enable.bat", "a", encoding="UTF-8") as enable_script:
         for line in es_lines:
             enable_script.write(f"{line}\n")
+        
+    print("done")
 
     return 0
 
